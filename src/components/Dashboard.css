@@ -1,0 +1,446 @@
+.dashboard-container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 0;
+  background: var(--bg-secondary);
+}
+
+.dashboard {
+  width: 100%;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 48px) clamp(16px, 4vw, 24px);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: clamp(32px, 5vw, 56px);
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header-content {
+  flex: 1;
+  min-width: 200px;
+}
+
+.header-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.title {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-size: clamp(0.9375rem, 2vw, 1.0625rem);
+  color: var(--text-tertiary);
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Status Indicator */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--bg-tertiary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.status-indicator.connected {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--success);
+}
+
+.status-indicator.disconnected {
+  background: rgba(255, 59, 48, 0.15);
+  color: var(--danger);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Update Info in Header */
+.update-info-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.update-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.update-label-header {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.update-value-header {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.update-value-header.countdown {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Cards Grid - iOS 2x2 Layout for Mobile */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 3vw, 20px);
+  margin-bottom: clamp(24px, 4vw, 32px);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Metric Card */
+.metric-card {
+  position: relative;
+  background: var(--card-bg);
+  border: 0.5px solid var(--border-light);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
+}
+
+.metric-card:active {
+  transform: scale(0.99);
+}
+
+.metric-card.alert {
+  border-color: var(--danger);
+  border-width: 1px;
+}
+
+.card-content {
+  padding: clamp(20px, 4vw, 24px);
+  position: relative;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(0, 122, 255, 0.1);
+  flex-shrink: 0;
+}
+
+/* Specific card icon colors */
+.card-icon.main-tank {
+  color: #007AFF;
+  background: rgba(0, 122, 255, 0.15);
+}
+
+.card-icon.ro-tank {
+  color: #5856D6;
+  background: rgba(88, 86, 214, 0.15);
+}
+
+.card-icon.reject-tank {
+  color: #34C759;
+  background: rgba(52, 199, 89, 0.15);
+}
+
+.card-icon.ph-level {
+  color: #FF9500;
+  background: rgba(255, 149, 0, 0.15);
+}
+
+.card-title {
+  font-size: clamp(0.8125rem, 2vw, 0.9375rem);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0;
+  letter-spacing: -0.01em;
+  flex: 1;
+  margin-left: 12px;
+}
+
+.card-value {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.value-number {
+  font-size: clamp(2.5rem, 8vw, 3.25rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+.value-unit {
+  font-size: clamp(0.9375rem, 2.5vw, 1.125rem);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: -0.01em;
+}
+
+/* Alert Badge */
+.alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--danger);
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 12px;
+  letter-spacing: -0.01em;
+}
+
+/* Threshold Info */
+.threshold-info {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Chart Section */
+.chart-section {
+  margin: clamp(24px, 4vw, 40px) 0;
+  padding: clamp(20px, 4vw, 28px);
+  background: var(--card-bg);
+  border: 0.5px solid var(--border-light);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-header {
+  margin-bottom: clamp(20px, 3vw, 28px);
+  text-align: center;
+}
+
+.chart-title {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.chart-subtitle {
+  font-size: clamp(0.8125rem, 2vw, 0.9375rem);
+  color: var(--text-tertiary);
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.chart-container {
+  width: 100%;
+  height: clamp(250px, 40vw, 400px);
+  position: relative;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .header-status {
+    width: 100%;
+    align-items: stretch;
+  }
+  
+  .update-info-header {
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .update-item {
+    align-items: center;
+  }
+
+  .chart-container {
+    height: 300px;
+  }
+
+  .dashboard {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .status-indicator {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card-content {
+    padding: 20px;
+  }
+
+  .value-number {
+    font-size: 2.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: 12px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.9375rem;
+  }
+
+  .card-content {
+    padding: 18px;
+  }
+
+  .value-number {
+    font-size: 2.5rem;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 900px) and (orientation: landscape) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .metric-card:active {
+    transform: scale(0.98);
+  }
+  
+  .metric-card:hover {
+    transform: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Selection styling */
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Card icons for different metrics */
+.card-icon.main-tank { background: rgba(0, 122, 255, 0.1); color: #007AFF; }
+.card-icon.ro-tank { background: rgba(88, 86, 214, 0.1); color: #5856D6; }
+.card-icon.reject-tank { background: rgba(52, 199, 89, 0.1); color: #34C759; }
+.card-icon.ph-level { background: rgba(255, 149, 0, 0.1); color: #FF9500; }

@@ -1,0 +1,32 @@
+{
+  "name": "water-quality-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Real-time water quality monitoring dashboard with TTN integration",
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/water-quality-monitor.git"
+  },
+  "dependencies": {
+    "chart.js": "^4.5.1",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^8.2.2",
+    "vite": "^5.0.12"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "postinstall": "cd bridge-server && npm install",
+    "bridge": "cd bridge-server && npm start",
+    "start": "concurrently \"npm run bridge\" \"npm run dev\" --names \"BRIDGE,REACT\" --prefix-colors \"green,cyan\""
+  }
+}
