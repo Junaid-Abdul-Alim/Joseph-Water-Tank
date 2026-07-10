@@ -1,0 +1,208 @@
+================================================================================
+  WINDOWS SECURITY WARNING FIX
+  Water Quality Monitor Installation Guide
+================================================================================
+
+PROBLEM: "This file does not have a valid digital signature"
+
+This is a normal Windows security feature for files downloaded from the internet
+or transferred from another computer. Here's how to safely install the application.
+
+================================================================================
+  METHOD 1: UNBLOCK FILES (RECOMMENDED - EASIEST)
+================================================================================
+
+BEFORE running any installation script:
+
+Step 1: Unblock the ZIP File
+   a. Right-click on "WaterQualityMonitor-v1.0.0-Optimized.zip"
+   b. Select "Properties"
+   c. At the bottom, check "Unblock" checkbox
+   d. Click "Apply" then "OK"
+
+Step 2: Extract and Unblock All Files
+   a. Extract the ZIP file
+   b. Open the extracted folder
+   c. Run "UNBLOCK-AND-INSTALL.bat" (double-click)
+   d. This will unblock all files and start installation
+
+OR manually unblock:
+   a. Right-click the extracted folder
+   b. Select "Properties"
+   c. Check "Unblock" at the bottom
+   d. Click "Apply" then "OK"
+   e. When prompted, choose "Apply to all files and folders"
+
+================================================================================
+  METHOD 2: SIMPLE INSTALLER (NO POWERSHELL)
+================================================================================
+
+If PowerShell scripts are blocked, use the simple batch installer:
+
+Step 1: Unblock ZIP (see METHOD 1, Step 1)
+Step 2: Extract the ZIP file
+Step 3: Run "SIMPLE-INSTALL.bat" (double-click)
+   - This uses only batch commands (no PowerShell)
+   - Safe to run on any Windows computer
+   - No digital signature required for .bat files
+
+================================================================================
+  METHOD 3: MANUAL INSTALLATION
+================================================================================
+
+If all automated scripts are blocked:
+
+Step 1: Install Node.js
+   - Download from: https://nodejs.org/
+   - Install LTS version
+   - Restart computer
+
+Step 2: Open PowerShell or Command Prompt
+   - Right-click on extracted folder
+   - Select "Open in Terminal" or "Open PowerShell window here"
+
+Step 3: Install Dependencies
+   Run these commands one by one:
+   
+   npm install
+   cd bridge-server
+   npm install
+   cd ..
+
+Step 4: Configure TTN Credentials
+   - Navigate to: bridge-server folder
+   - Copy .env.example to .env
+   - Edit .env with your TTN credentials
+
+Step 5: Build Application
+   npm run build
+
+Step 6: Create Desktop Shortcut
+   - Right-click "launch-silent.vbs"
+   - Select "Create shortcut"
+   - Move shortcut to Desktop
+   - Rename to "Water Quality Monitor"
+
+Step 7: Run Application
+   - Double-click the desktop shortcut
+   - OR run: launch-silent.vbs from the folder
+
+================================================================================
+  METHOD 4: TEMPORARILY ALLOW POWERSHELL SCRIPTS
+================================================================================
+
+If you want to use the auto-setup.bat:
+
+Step 1: Open PowerShell as Administrator
+   - Press Windows key
+   - Type "PowerShell"
+   - Right-click "Windows PowerShell"
+   - Select "Run as administrator"
+
+Step 2: Temporarily Allow Scripts
+   Run this command:
+   
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+   When prompted, type: Y and press Enter
+
+Step 3: Run Auto-Setup
+   - Close PowerShell
+   - Navigate to extracted folder
+   - Double-click "auto-setup.bat"
+
+Step 4 (IMPORTANT): Restore Security Settings
+   After installation, open PowerShell as Admin again and run:
+   
+   Set-ExecutionPolicy -ExecutionPolicy Restricted -Scope CurrentUser
+
+================================================================================
+  WHY THIS HAPPENS
+================================================================================
+
+Windows blocks files from "untrusted" sources for security:
+
+1. Files downloaded from internet
+2. Files transferred via USB/email
+3. Files without digital signatures
+4. PowerShell scripts (.ps1 files)
+
+This is NORMAL and SAFE to bypass for software you trust.
+
+Digital signatures cost money to obtain, so small projects often don't have them.
+This is a legitimate application developed by Fluid Fusion Team.
+
+================================================================================
+  RECOMMENDED INSTALLATION ORDER
+================================================================================
+
+Try these methods in order until one works:
+
+1. UNBLOCK-AND-INSTALL.bat          ⭐ EASIEST
+2. SIMPLE-INSTALL.bat               ⭐ NO POWERSHELL NEEDED
+3. Manual Installation              ⭐ ALWAYS WORKS
+4. Temporarily Allow PowerShell     ⭐ FOR AUTO-SETUP
+
+================================================================================
+  VERIFICATION AFTER INSTALLATION
+================================================================================
+
+✓ Desktop shortcut "Water Quality Monitor" created
+✓ Application launches without terminal window
+✓ Shows "FLUID FUSION" branding
+✓ Footer shows "Developed by Fluid Fusion Team · Dr. Vinod Kumar"
+✓ Bridge status shows connection state
+✓ Version shown: v1.0.0
+
+================================================================================
+  TROUBLESHOOTING
+================================================================================
+
+Q: "UNBLOCK-AND-INSTALL.bat doesn't work"
+A: Use SIMPLE-INSTALL.bat instead (doesn't need PowerShell)
+
+Q: "SIMPLE-INSTALL.bat also blocked"
+A: Use Manual Installation method (always works)
+
+Q: "Node.js not found"
+A: Install Node.js from https://nodejs.org/ and restart computer
+
+Q: "npm install fails"
+A: Check internet connection, try again
+
+Q: "Auto-setup still asks for digital signature"
+A: Right-click auto-setup.bat → Properties → Unblock → OK
+
+Q: "Smart Screen blocks the application"
+A: Click "More info" → "Run anyway" (safe for this application)
+
+================================================================================
+  STILL HAVING ISSUES?
+================================================================================
+
+Contact Options:
+1. Review USER_GUIDE.md for detailed instructions
+2. Check TROUBLESHOOTING.md for common problems
+3. Use Manual Installation (METHOD 3) - always works
+4. Ensure you unblocked the ZIP file BEFORE extracting
+
+Remember: These security warnings are normal for files without digital signatures.
+The application is safe to install and use.
+
+================================================================================
+  QUICK SUMMARY
+================================================================================
+
+FASTEST SOLUTION:
+1. Right-click ZIP file → Properties → Unblock → Apply → OK
+2. Extract ZIP
+3. Run UNBLOCK-AND-INSTALL.bat
+4. Done!
+
+ALTERNATIVE (No PowerShell):
+1. Extract ZIP
+2. Run SIMPLE-INSTALL.bat
+3. Follow on-screen instructions
+4. Done!
+
+================================================================================

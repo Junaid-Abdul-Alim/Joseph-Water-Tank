@@ -10,6 +10,15 @@ bridge-server/node_modules
 # Production
 /build
 /dist
+/release
+
+# Generated packages
+/WaterQualityMonitor-Portable
+/WaterQualityMonitor-CollegePortable
+/WaterQualityMonitor-CollegePortable.zip
+/WaterQualityMonitor-CollegePrivateInstall
+/WaterQualityMonitor-CollegePrivateInstall.zip
+/GITHUB-RELEASE-UPLOAD.txt
 
 # Environment variables
 .env
@@ -18,6 +27,14 @@ bridge-server/node_modules
 .env.test.local
 .env.production.local
 bridge-server/.env
+
+# Runtime data
+bridge-server/*.db
+bridge-server/*.db-shm
+bridge-server/*.db-wal
+bridge-server/*.sqlite
+bridge-server/*.sqlite-*
+bridge-server/sensor_readings.json
 
 # Misc
 .DS_Store
