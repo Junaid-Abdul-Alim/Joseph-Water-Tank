@@ -76,11 +76,6 @@ function ensureSqliteColumns() {
   }
 }
 
-function isMissingOptionalSqlite(error) {
-  return error?.code === 'MODULE_NOT_FOUND'
-    && String(error.message || '').includes('better-sqlite3');
-}
-
 function initSqlite() {
   try {
     const Database = require('better-sqlite3');
@@ -184,11 +179,7 @@ function initSqlite() {
   } catch (error) {
     db = null;
     sqlite = null;
-
-    if (!isMissingOptionalSqlite(error)) {
-      console.warn('[DATABASE] SQLite unavailable, using JSON storage:', error.message);
-    }
-
+    console.warn('[DATABASE] SQLite unavailable, using JSON storage:', error.message);
     return false;
   }
 }

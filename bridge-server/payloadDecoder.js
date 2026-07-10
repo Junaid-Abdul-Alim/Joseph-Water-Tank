@@ -71,8 +71,8 @@ function normalizeSensorData(decodedPayload) {
     ro_ec: decodedPayload.ro_ec,
     reject_tds: decodedPayload.reject_tds,
     reject_ec: decodedPayload.reject_ec,
-    ph: decodedPayload.ph ?? decodedPayload.pH ?? decodedPayload.PH,
-    turbidity: decodedPayload.turbidity ?? decodedPayload.turbidity_ntu ?? decodedPayload.ntu,
+    ph: decodedPayload.ph,
+    turbidity: decodedPayload.turbidity,
     temperature: decodedPayload.temperature,
     water_level_cm: decodedPayload.water_level_cm,
     flow_rate: decodedPayload.flow_rate
@@ -137,21 +137,20 @@ function decodeFrmPayload(frmPayload) {
 
 function extractSensorData(ttnPayload) {
   const uplink = ttnPayload?.uplink_message;
-  const rawDecoded = decodeFrmPayload(uplink?.frm_payload);
-
-  if (rawDecoded) {
-    return {
-      source: 'frm_payload',
-      data: rawDecoded
-    };
-  }
-
   const decoded = normalizeSensorData(uplink?.decoded_payload);
 
   if (decoded) {
     return {
       source: 'decoded_payload',
       data: decoded
+    };
+  }
+
+  const rawDecoded = decodeFrmPayload(uplink?.frm_payload);
+  if (rawDecoded) {
+    return {
+      source: 'frm_payload',
+      data: rawDecoded
     };
   }
 
