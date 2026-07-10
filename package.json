@@ -1,6 +1,6 @@
 {
   "name": "water-quality-monitor",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "Real-time water quality monitoring dashboard with TTN integration",
   "author": "",

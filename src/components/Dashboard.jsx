@@ -124,7 +124,8 @@ const Dashboard = () => {
     available: false,
     message: '',
     error: false,
-    latestVersion: null
+    latestVersion: null,
+    progress: null
   });
   const wsRef = useRef(null);
   const updaterApi = typeof window !== 'undefined' ? window.electron?.updater : null;
@@ -136,7 +137,8 @@ const Dashboard = () => {
         setUpdateState(prev => ({
           ...prev,
           message: 'Updates are available in the desktop app only.',
-          error: true
+          error: true,
+          progress: null
         }));
       }
       return;
@@ -146,7 +148,8 @@ const Dashboard = () => {
       ...prev,
       checking: true,
       error: false,
-      message: silent ? prev.message : 'Checking for updates...'
+      message: silent ? prev.message : 'Checking for updates...',
+      progress: null
     }));
 
     try {
@@ -157,7 +160,8 @@ const Dashboard = () => {
           ...prev,
           checking: false,
           available: false,
-          latestVersion: result.latestVersion || null
+          latestVersion: result.latestVersion || null,
+          progress: null
         }));
         return;
       }
@@ -168,7 +172,8 @@ const Dashboard = () => {
         available: Boolean(result.available),
         message: result.message || (result.available ? 'Update available.' : 'No update available.'),
         error: !result.success,
-        latestVersion: result.latestVersion || null
+        latestVersion: result.latestVersion || null,
+        progress: null
       });
     } catch (error) {
       if (!silent) {
@@ -178,7 +183,8 @@ const Dashboard = () => {
           available: false,
           message: error.message || 'Could not check for updates.',
           error: true,
-          latestVersion: null
+          latestVersion: null,
+          progress: null
         });
       } else {
         setUpdateState(prev => ({
@@ -199,7 +205,8 @@ const Dashboard = () => {
       installing: true,
       checking: false,
       error: false,
-      message: 'Downloading update...'
+      message: 'Starting update download...',
+      progress: 0
     }));
 
     try {
@@ -213,16 +220,35 @@ const Dashboard = () => {
         ...prev,
         installing: true,
         message: result.message || 'Update downloaded. Restarting...',
-        error: false
+        error: false,
+        progress: 100
       }));
     } catch (error) {
       setUpdateState(prev => ({
         ...prev,
         installing: false,
         message: error.message || 'Update install failed.',
-        error: true
+        error: true,
+        progress: null
       }));
     }
+  }, [updaterApi]);
+
+  useEffect(() => {
+    if (!updaterApi?.onProgress) {
+      return undefined;
+    }
+
+    return updaterApi.onProgress((progress) => {
+      setUpdateState(prev => ({
+        ...prev,
+        installing: true,
+        checking: false,
+        error: false,
+        message: progress.message || prev.message,
+        progress: typeof progress.percent === 'number' ? progress.percent : prev.progress
+      }));
+    });
   }, [updaterApi]);
 
   const updateUI = useCallback((sensorData) => {
@@ -627,7 +653,9 @@ const Dashboard = () => {
                       disabled={updateState.checking || updateState.installing}
                     >
                       {updateState.installing
-                        ? 'Installing...'
+                        ? updateState.progress != null && updateState.progress < 100
+                          ? `Downloading ${updateState.progress}%`
+                          : 'Installing...'
                         : updateState.available
                           ? `Install ${updateState.latestVersion || 'Update'}`
                           : updateState.checking
@@ -637,6 +665,11 @@ const Dashboard = () => {
                     {updateState.message && (
                       <div className={`update-message ${updateState.error ? 'error' : updateState.available ? 'available' : ''}`}>
                         {updateState.message}
+                      </div>
+                    )}
+                    {updateState.installing && updateState.progress != null && (
+                      <div className="update-progress" aria-label={`Update progress ${updateState.progress}%`}>
+                        <div className="update-progress-bar" style={{ width: `${updateState.progress}%` }}></div>
                       </div>
                     )}
                   </div>

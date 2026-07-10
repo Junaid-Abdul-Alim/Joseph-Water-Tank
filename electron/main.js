@@ -205,7 +205,13 @@ function requestJson(url, redirectCount = 0) {
   });
 }
 
-function downloadFile(url, destinationPath, redirectCount = 0) {
+function emitUpdateProgress(payload) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updates:progress', payload);
+  }
+}
+
+function downloadFile(url, destinationPath, onProgress, redirectCount = 0) {
   return new Promise((resolve, reject) => {
     const request = https.get(url, {
       headers: {
@@ -221,7 +227,7 @@ function downloadFile(url, destinationPath, redirectCount = 0) {
           return;
         }
 
-        resolve(downloadFile(new URL(headers.location, url).toString(), destinationPath, redirectCount + 1));
+        resolve(downloadFile(new URL(headers.location, url).toString(), destinationPath, onProgress, redirectCount + 1));
         return;
       }
 
@@ -232,6 +238,30 @@ function downloadFile(url, destinationPath, redirectCount = 0) {
       }
 
       const file = fs.createWriteStream(destinationPath);
+      const totalBytes = Number.parseInt(headers['content-length'], 10) || 0;
+      let downloadedBytes = 0;
+      let lastPercent = -1;
+
+      response.on('data', (chunk) => {
+        downloadedBytes += chunk.length;
+
+        if (!onProgress || !totalBytes) {
+          return;
+        }
+
+        const percent = Math.floor((downloadedBytes / totalBytes) * 100);
+        if (percent !== lastPercent) {
+          lastPercent = percent;
+          onProgress({
+            stage: 'download',
+            percent,
+            downloadedBytes,
+            totalBytes,
+            message: `Downloading update: ${percent}%`
+          });
+        }
+      });
+
       response.pipe(file);
 
       file.on('finish', () => {
@@ -355,7 +385,23 @@ async function installLatestUpdate() {
   const safeVersion = normalizeVersion(update.latestVersion).replace(/[^\d.]/g, '') || 'latest';
   const downloadPath = path.join(app.getPath('temp'), `WaterQualityMonitor-${safeVersion}.zip`);
 
-  await downloadFile(update.downloadUrl, downloadPath);
+  emitUpdateProgress({
+    stage: 'download',
+    percent: 0,
+    downloadedBytes: 0,
+    totalBytes: update.assetSize || 0,
+    message: 'Starting update download...'
+  });
+
+  await downloadFile(update.downloadUrl, downloadPath, emitUpdateProgress);
+
+  emitUpdateProgress({
+    stage: 'install',
+    percent: 100,
+    downloadedBytes: update.assetSize || 0,
+    totalBytes: update.assetSize || 0,
+    message: 'Download complete. Installing files and restarting...'
+  });
 
   const installDir = path.dirname(process.execPath);
   const updaterProcess = spawn('powershell.exe', [

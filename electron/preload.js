@@ -13,7 +13,12 @@ contextBridge.exposeInMainWorld('electron', {
   },
   updater: {
     check: () => ipcRenderer.invoke('updates:check'),
-    install: () => ipcRenderer.invoke('updates:install')
+    install: () => ipcRenderer.invoke('updates:install'),
+    onProgress: (callback) => {
+      const listener = (_event, progress) => callback(progress);
+      ipcRenderer.on('updates:progress', listener);
+      return () => ipcRenderer.removeListener('updates:progress', listener);
+    }
   },
   platform: process.platform,
   isElectron: true

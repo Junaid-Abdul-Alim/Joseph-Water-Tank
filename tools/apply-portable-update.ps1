@@ -48,7 +48,8 @@ if (Test-Path $externalEnv) {
 }
 
 New-Item -ItemType Directory -Path $temp -Force | Out-Null
-Expand-Archive -LiteralPath $package -DestinationPath $temp -Force
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::ExtractToDirectory($package, $temp)
 
 $source = $temp
 $nested = Get-ChildItem -LiteralPath $temp -Directory | Where-Object { Test-Path (Join-Path $_.FullName "Water Quality Monitor.exe") } | Select-Object -First 1
