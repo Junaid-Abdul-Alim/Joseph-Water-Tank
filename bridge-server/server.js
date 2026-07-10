@@ -268,6 +268,30 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+function logServerError(name, port, error) {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`[${name} ERROR] Port ${port} is already in use. Close the old Water Quality Monitor process and start the app again.`);
+    return;
+  }
+
+  console.error(`[${name} ERROR]`, error.message);
+}
+
+const serverReady = {
+  http: false,
+  ws: false
+};
+
+function logBridgeReady() {
+  if (!serverReady.http || !serverReady.ws) {
+    return;
+  }
+
+  console.log('\n[OK] Bridge server ready! React app can now connect to:');
+  console.log(`   - HTTP: http://localhost:${HTTP_PORT}/api/data`);
+  console.log(`   - WebSocket: ws://localhost:${WS_PORT}\n`);
+}
+
 // Check if device is still online based on last seen time
 function checkDeviceOnlineStatus() {
   if (deviceStatus.lastSeen) {
@@ -358,17 +382,33 @@ app.get('/api/statistics', (req, res) => {
   }
 });
 
-app.listen(HTTP_PORT, () => {
+const httpServer = app.listen(HTTP_PORT, () => {
   console.log(`[HTTP] API server running on http://localhost:${HTTP_PORT}`);
   console.log(`   - GET /api/data - Get latest sensor data`);
   console.log(`   - GET /api/health - Server health check`);
   console.log(`   - GET /api/history/latest?limit=N - Get last N readings`);
   console.log(`   - GET /api/history/hours/:hours - Get readings for last N hours`);
   console.log(`   - GET /api/statistics - Get database statistics`);
+  serverReady.http = true;
+  logBridgeReady();
+});
+
+httpServer.on('error', (error) => {
+  logServerError('HTTP', HTTP_PORT, error);
 });
 
 const wss = new WebSocketServer({ port: WS_PORT });
 const clients = new Set();
+
+wss.on('error', (error) => {
+  logServerError('WS', WS_PORT, error);
+});
+
+wss.on('listening', () => {
+  console.log(`[WS] WebSocket server running on ws://localhost:${WS_PORT}`);
+  serverReady.ws = true;
+  logBridgeReady();
+});
 
 wss.on('connection', (ws) => {
   clients.add(ws);
@@ -427,8 +467,3 @@ function broadcastToClients(payload) {
     console.log(`[BROADCAST] Sent to ${sentCount} client(s)\n`);
   }
 }
-
-console.log(`[WS] WebSocket server running on ws://localhost:${WS_PORT}`);
-console.log('\n[OK] Bridge server ready! React app can now connect to:');
-console.log(`   - HTTP: http://localhost:${HTTP_PORT}/api/data`);
-console.log(`   - WebSocket: ws://localhost:${WS_PORT}\n`);

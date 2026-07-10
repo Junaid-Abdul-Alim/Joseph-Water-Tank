@@ -92,10 +92,6 @@ function startBridgeServer() {
 }
 
 function ensureBridgeConfig(bridgeDataDir, bridgeEnvPath) {
-  if (fs.existsSync(bridgeEnvPath)) {
-    return;
-  }
-
   const externalConfigDir = app.isPackaged ? path.dirname(process.execPath) : path.join(__dirname, '..');
   const candidates = [
     path.join(externalConfigDir, 'bridge-server', '.env'),
@@ -104,7 +100,20 @@ function ensureBridgeConfig(bridgeDataDir, bridgeEnvPath) {
     path.join(__dirname, '../bridge-server/.env.example')
   ];
 
-  const sourcePath = candidates.find((candidate) => fs.existsSync(candidate));
+  const realConfigPath = candidates.find((candidate) => {
+    return path.basename(candidate) === '.env' && hasRealBridgeConfig(candidate);
+  });
+
+  if (fs.existsSync(bridgeEnvPath)) {
+    if (!realConfigPath || hasRealBridgeConfig(bridgeEnvPath)) {
+      return;
+    }
+
+    fs.copyFileSync(realConfigPath, bridgeEnvPath);
+    return;
+  }
+
+  const sourcePath = realConfigPath || candidates.find((candidate) => fs.existsSync(candidate));
 
   if (sourcePath) {
     fs.copyFileSync(sourcePath, bridgeEnvPath);
@@ -126,6 +135,44 @@ function ensureBridgeConfig(bridgeDataDir, bridgeEnvPath) {
   ].join('\n');
 
   fs.writeFileSync(bridgeEnvPath, envTemplate, 'utf8');
+}
+
+function readTextFile(filePath) {
+  try {
+    return fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+function parseEnvValue(content, key) {
+  const line = content
+    .split(/\r?\n/)
+    .find((entry) => entry.trim().startsWith(`${key}=`));
+
+  if (!line) {
+    return '';
+  }
+
+  return line.slice(line.indexOf('=') + 1).trim().replace(/^["']|["']$/g, '');
+}
+
+function hasConfiguredValue(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return Boolean(normalized) && !normalized.includes('your_') && !normalized.includes('your-');
+}
+
+function hasRealBridgeConfig(filePath) {
+  const content = readTextFile(filePath);
+  if (!content) {
+    return false;
+  }
+
+  return [
+    'TTN_MQTT_USERNAME',
+    'TTN_MQTT_PASSWORD',
+    'TTN_MQTT_TOPIC'
+  ].every((key) => hasConfiguredValue(parseEnvValue(content, key)));
 }
 
 function normalizeVersion(version) {
@@ -249,7 +296,7 @@ function downloadFile(url, destinationPath, onProgress, redirectCount = 0) {
           return;
         }
 
-        const percent = Math.floor((downloadedBytes / totalBytes) * 100);
+        const percent = Math.max(0, Math.min(100, Math.floor((downloadedBytes / totalBytes) * 100)));
         if (percent !== lastPercent) {
           lastPercent = percent;
           onProgress({
@@ -345,7 +392,7 @@ async function checkForUpdates() {
         success: false,
         configured: true,
         currentVersion,
-        message: 'No GitHub Release was found yet. Publish the first release, then check again.'
+        message: 'No GitHub Release was found, or the repository is not reachable from this computer.'
       };
     }
 
